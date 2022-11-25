@@ -1,0 +1,202 @@
+﻿@inject IJSRuntime JSRuntime
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+
+<div id="sidebar" class="active">
+    <div class="sidebar-wrapper active">
+        <div class="sidebar-header">
+            <div class="d-flex justify-content-center">
+                <div class="logo">
+                    <a href="/categories"><img src="images/logo/wanija-logo-b.png" alt="Logo" srcset=""></a>
+                </div>
+                <div class="toggler">
+                    <button class="btn py-0 sideBarCloseBtn sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <ul class="menu">
+                <li class="sidebar-title"><button class="btn btn-danger" @onclick="Logout">Logout</button></li>
+                <li class="sidebar-title">Menu</li>
+
+                @*           <li class="sidebar-item @(activeValue == "dashboard" ? "active" : "")">
+            <a href="/" class='sidebar-link'>
+                <i class="bi bi-grid-fill"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>*@
+                @if (User != null && (User.UserType == 9 || User.UserType == 4))
+                {
+                    <li class="sidebar-item @(activeValue == "categories" ? "active" : "")">
+                        <a href="/categories" class='sidebar-link'>
+                            <i class="fas fa-archive"></i>
+                            <span>Categories</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "SellerApproval" ? "active" : "")">
+                        <a href="/SellerApproval" class='sidebar-link'>
+                            <i class="fas fa-boxes"></i>
+                            <span>SellerApproval</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "currentSellers" ? "active" : "")">
+                        <a href="/currentSellers" class='sidebar-link'>
+                            <i class="fas fa-warehouse"></i>
+                            <span>Current Sellers</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "ProductApproval" ? "active" : "")">
+                        <a href="/ProductApproval" class='sidebar-link'>
+                            <i class="fas fa-warehouse"></i>
+                            <span>Product Approval</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "blog" ? "active" : "")">
+                        <a href="/blogPosts" class='sidebar-link'>
+                            <i class="fas fa-edit"></i>
+                            <span>News / Events</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "delivery" ? "active" : "")">
+                        <a href="/delivery" class='sidebar-link'>
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Delivery Fee</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "promotion" ? "active" : "")">
+                        <a href="/promotion" class='sidebar-link'>
+                            <i class="fas fa-percentage"></i>
+                            <span>Promotion</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "gallery" ? "active" : "")">
+                        <a href="/gallery" class='sidebar-link'>
+                            <i class="fas fa-images"></i>
+                            <span>Gallery</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "AddOutlets" ? "active" : "")">
+                        <a href="/AddOutlets" class='sidebar-link'>
+                            <i class="fas fa-store"></i>
+                            <span>Outlets</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "refund" ? "active" : "")">
+                        <a href="/refund" class='sidebar-link'>
+                            <i class="fas fa-undo-alt"></i>
+                            <span>Cancel & Refund</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "Slider" ? "active" : "")">
+                        <a href="/Slider" class='sidebar-link'>
+                            <i class="fas fa-image"></i>
+                            <span>Slider</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "Banner" ? "active" : "")">
+                        <a href="/Banner" class='sidebar-link'>
+                            <i class="fas fa-image"></i>
+                            <span>Banner</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "UserCreation" ? "active" : "")">
+                        <a href="/UserCreation" class='sidebar-link'>
+                            <i class="fas fa-users"></i>
+                            <span>User Creation</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "UserProfile" ? "active" : "")">
+                        <a href="/UserProfile" class='sidebar-link'>
+                            <i class="fas fa-user"></i>
+                            <span>User Profile</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item @(activeValue == "CurrencyRateChange" ? "active" : "")">
+                        <a href="/CurrencyRateChange" class='sidebar-link'>
+                            <i class="fas fa-users"></i>
+                            <span>Currency Rate Change</span>
+                        </a>
+                    </li>
+
+                }
+                @*
+        <li class="sidebar-item @(activeValue == "outlets" ? "active" : "")">
+            <a href="/outlets" class='sidebar-link'>
+                <i class="fas fa-store-alt"></i>
+                <span>Outlets</span>
+            </a>
+        </li>
+        <li class="sidebar-item @(activeValue == "delivery" ? "active" : "")">
+            <a href="/delivery" class='sidebar-link'>
+                <i class="fas fa-truck"></i>
+                <span>Delivery Fees</span>
+            </a>
+        </li>*@
+
+                @* <li class="sidebar-item  has-sub @(activeValue == "customer" ? "active" : "")">
+            <div class='sidebar-link'>
+                <i class="fas fa-boxes"></i>
+                <span>Items</span>
+            </div>
+            <ul class="submenu ">
+                <li class="submenu-item ">
+                    <a href="/personal_customer">Personal</a>
+                </li>
+                <li class="submenu-item ">
+                    <a href="">Coporate</a>
+                </li>
+                <li class="submenu-item ">
+                    <a href="">Excel Upload</a>
+                </li>
+                <hr class="bg-light " />
+            </ul>
+        </li>*@
+            </ul>
+        </div>
+        <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+    </div>
+</div>
+
+@code {
+
+    private int roleId { get; set; }
+    private string userId { get; set; }
+    private AdminLogin User { get; set; }
+
+    [Parameter]
+    public string activeValue { get; set; }
+
+    protected async override void OnInitialized()
+    {
+        try
+        {
+
+
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            User = await localStore.GetItemAsync<AdminLogin>("user");
+            if (User == null)
+            {
+                NavManager.NavigateTo("/");
+            }
+            await JSRuntime.InvokeAsync<object>("SideNav");
+            StateHasChanged();
+        }
+    }
+
+    public async void Logout()
+    {
+        await localStore.RemoveItemAsync("user");
+        NavManager.NavigateTo("/");
+    }
+}

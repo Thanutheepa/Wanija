@@ -1,0 +1,374 @@
+﻿@page "/AddOutlets"
+@inject IJSRuntime JSRuntime
+@inject IApiService ApiService
+@inject IApiService ApiService2
+@inject IApiService ApiService3
+@inject IApiService ApiService4
+@inject IApiService ApiService5
+@inject IApiService ApiService6
+@inject IApiService ApiService7
+
+<SideMenu activeValue="AddOutlets" />
+
+<div id="main">
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Outlet</h3>
+                </div>
+                <div class="col-12 col-md-6 order-md-2 order-first">
+                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+
+                        <div class="card-header">
+                            @if (isUpdate)
+                            {
+                                <h4 class="card-title">Update Outlet</h4>
+                            }
+                            else
+                            {
+                                <h4 class="card-title">New Outlet</h4>
+                            }
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Company Id <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="companyId"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Outlet Name <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="name"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">District <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <RadzenDropDown Class="w-100" @bind-value="districtId" AllowClear="true" TValue="int" Data="@district" TextProperty="DistrictName" ValueProperty="DistrictId" Placeholder="Select District" AllowFiltering="true" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">E Mail <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="email"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Contact <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="contact"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Active Status <span class="text-danger"></span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <RadzenRadioButtonList TValue="int" @bind-value="IsActive">
+                                            <Items>
+                                                <RadzenRadioButtonListItem Text="Active" Value="1" />
+                                                <RadzenRadioButtonListItem Text="Not Active" Value="0" />
+                                            </Items>
+                                        </RadzenRadioButtonList>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Manager Name <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="managerName"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Land No <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="landno"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Latitude <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="latitude"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Longitude<span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="longititude"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Shop Id <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="shopid"></div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm"></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12 justify-content-end">
+                                        @if (isUpdate)
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="UpdateOutlet">Update</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="CreateOutlet">Create</button>
+                                        }
+                                        <button type="reset" class="btn btn-light-secondary ">Reset</button>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        
+
+                        <div class="card-header">
+                            <h4 class="card-title">Existing Outlets</h4>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 my-2">
+                                        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                                                        Data="@outlets" TItem="Outlet" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                            <Columns>
+                                                <RadzenDataGridColumn TItem="Outlet" Property="OutletName" Title="Outlet Name" Width="150px" />
+                                                <RadzenDataGridColumn TItem="Outlet" Property="_district.DistrictName" Title="Distric Name" Width="150px" />
+                                                <RadzenDataGridColumn TItem="Outlet" Property="IsActive" Title="Is Active" Width="150px" />
+                                                <RadzenDataGridColumn TItem="Outlet" Property="ManagerName" Title="Manager Name" Width="150px" />
+                                                <RadzenDataGridColumn TItem="Outlet" Title="Action" Context="outlet" Width="150px">
+                                                    <Template>
+                                                        <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Edit(outlet.OutletId)) Text="Edit" ButtonStyle="ButtonStyle.Secondary" />
+                                                    </Template>
+
+                                                </RadzenDataGridColumn>
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+
+@code {
+
+    //Footer Date
+    DateTime myDateTime = DateTime.Now;
+    string year;
+
+    //Changing Outlet card
+    private bool isUpdate { get; set; } = false;
+
+    //All Parameters for create an Outlet
+    private int companyId { get; set; } = 1;
+    private string name { get; set; }
+    private string email { get; set; }
+    private string contact { get; set; }
+    private int IsActive { get; set; } = 1;
+    private string managerName { get; set; }
+    private string landno { get; set; }
+    private string shopid { get; set; }
+    private string latitude { get; set; }
+    private string longititude { get; set; }
+    private int districtId { get; set; } = 1;
+
+
+    private IEnumerable<District> district;
+    private IEnumerable<Outlet> outlets;
+
+    //for Edit
+    Outlet editOne = new Outlet();
+    Outlet edt = new Outlet();
+
+    protected override async Task OnInitializedAsync()
+    {
+        year = myDateTime.Year.ToString();
+
+        district = (await ApiService.AllDistrict()).ToList();
+
+        outlets = (await ApiService2.GetAllOutlets()).ToList();
+
+        StateHasChanged();
+    }
+
+    Outlet newoutlet = new Outlet();
+    string msg { get; set; }
+
+    private async void CreateOutlet()
+    {
+        newoutlet.CompanyId = companyId;
+        newoutlet.ContactNumber = contact;
+        newoutlet.EmailAddress = email;
+        newoutlet.OutletName = name;
+        newoutlet.ShopId = shopid;
+        newoutlet.LandNumber = landno;
+        newoutlet.Latitude = latitude;
+        newoutlet.Longitude = longititude;
+        newoutlet.ManagerName = managerName;
+        newoutlet.DistrictId = districtId;
+        newoutlet.IsActive = IsActive;
+
+        if (contact == null || email == null || landno == null || latitude == null
+       || longititude == null || managerName == null || shopid == null || name == null
+       || districtId < 1 || companyId != 1)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+        }
+
+
+
+        else
+        {
+            msg = await ApiService3.AddoutletList(newoutlet);
+            outlets = (await ApiService4.GetAllOutlets()).ToList();
+            StateHasChanged();
+
+            if (msg == "\"Outlet Added successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "User created successfully.");
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+            }
+
+            clear();
+        }
+
+
+
+
+
+
+    }
+
+    private async void clear()
+    {
+
+        companyId = 1;
+        name = null;
+        email = null;
+        contact = null;
+        IsActive = 1;
+        managerName = null;
+        landno = null;
+        shopid = null;
+        latitude = null;
+        longititude = null;
+        districtId = 1;
+        StateHasChanged();
+
+    }
+
+    private async void Edit(int outlet_Id)
+    {
+        clear();
+        isUpdate = true;
+
+
+
+        editOne = outlets.Where(a => a.OutletId == outlet_Id).FirstOrDefault();
+        companyId = 1;
+        contact = editOne.ContactNumber;
+        email = editOne.EmailAddress;
+        name = editOne.OutletName;
+        shopid = editOne.ShopId;
+        landno = editOne.LandNumber;
+        latitude = editOne.Latitude;
+        longititude = editOne.Longitude;
+        managerName = editOne.ManagerName;
+        districtId = editOne.DistrictId;
+        IsActive = editOne.IsActive;
+        StateHasChanged();
+
+    }
+
+    private async void UpdateOutlet()
+    {
+        edt.OutletId = editOne.OutletId;
+        edt.CompanyId = companyId;
+        edt.ContactNumber = contact;
+        edt.EmailAddress = email;
+        edt.OutletName = name;
+        edt.ShopId = shopid;
+        edt.LandNumber = landno;
+        edt.Latitude = latitude;
+        edt.Longitude = longititude;
+        edt.ManagerName = managerName;
+        edt.DistrictId = districtId;
+        edt.IsActive = IsActive;
+
+        if (contact == "" || email == "" || landno == "" || latitude == ""
+           || longititude == "" || managerName == "" || shopid == "" || name == ""
+           || districtId < 1 || companyId != 1)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+        }
+
+        else
+        {
+            msg = await ApiService5.UpdateOutlet(edt);
+            outlets = (await ApiService6.GetAllOutlets()).ToList();
+            StateHasChanged();
+            clear();
+        }
+
+    }
+
+
+}

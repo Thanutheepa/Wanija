@@ -1,0 +1,325 @@
+﻿@page "/inventory"
+
+@inject IJSRuntime JSRuntime
+@inject IApiService apiService
+@inject IApiService apiService2
+@inject IFileUpload fileUpload
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+
+<SideMenu activeValue="inventory" />
+
+<div id="main">
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Inventory</h3>
+                </div>
+                @*<div class="col-12 col-md-6 order-md-2 order-first">
+                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Inventory</li>
+                            </ol>
+                        </nav>
+                    </div>*@
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            @if (isUpdate)
+                            {
+                                <h4 class="card-title">Update Item</h4>
+                            }
+                            else
+                            {
+                                <h4 class="card-title">New Item</h4>
+                            }
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Select Outlet <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <RadzenDropDown AllowClear="true" TValue="int" Data=@allOutlets TextProperty="OutletName" ValueProperty="OutletId" Class="w-100" @bind-Value="selectedOutlet" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Select Item <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <RadzenDropDown AllowClear="true" TValue="int" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Style="width:100%"
+                                                            Placeholder="Select Item..." Data=@allProducts TextProperty="name" ValueProperty="productId" @bind-Value="selectedProduct" Change=@(args => OnChange(args)) />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Current Stock <span class="text-danger"></span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="number" class="form-control form-control-sm" @bind-value="stock"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm"></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12 justify-content-end">
+                                        @if (isUpdate)
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="UpdateItem">Update</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="AddItem">Save</button>
+                                        }
+                                        <button type="reset" class="btn btn-light-secondary" @onclick="Clear">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p>@status</p>
+                        <div class="card-header">
+                            <h4 class="card-title">Existing Outlet Items @outletProductsNew.Count()</h4>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 my-2">
+                                        @if (outletProductsNew.Count > 0)
+                                        {
+                                            <RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Class="mb-4" />
+                                            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true"
+                                                            Data="@outletProductsNew" TItem="OutletProduct" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                                <Columns>
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="OutletId" Title="Outlet Id" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="ItemId" Title="Item Id" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="product.name" Title="Name" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="product.ItemCode" Title="Item Code" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="prodduct.CurrentStock" Title="Current Stock" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="product.SellingPrice" Title="Selling Price" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="product.IsActive" Title="Active" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Property="product.IsOnline" Title="Online" />
+                                                    <RadzenDataGridColumn TItem="OutletProduct" Title="Action" Context="product">
+                                                        <Template>
+                                                            <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Edit(product.product.productId)) Text="Edit" ButtonStyle="ButtonStyle.Secondary" />
+                                                        </Template>
+
+                                                    </RadzenDataGridColumn>
+                                                    @*                                                <RadzenDataGridColumn TItem="Function" Title="Action" Context="function">
+                        <Template>
+                            <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Delete(function.FunctionID)) Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+                        </Template>
+
+                    </RadzenDataGridColumn>*@
+                                                </Columns>
+                                            </RadzenDataGrid>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+@code {
+
+    RadzenDataGrid<OutletProduct> grid;
+
+    private string status { get; set; } = "";
+    private bool isUpdate { get; set; } = false;
+    private IEnumerable<Product> allProducts { get; set; } = new List<Product>();
+    private IEnumerable<Product> allOutletProducts { get; set; } = new List<Product>();
+    private List<Outlet> allOutlets { get; set; } = new List<Outlet>();
+    private List<OutletProduct> outletProductsNew{ get; set; } = new List<OutletProduct>();
+    private int selectedOutlet = 0;
+    private int selectedProduct { get; set; }
+    private double stock { get; set; } = 0;
+    Product editProduct = null;
+    private AdminLogin User { get; set; }
+
+    DateTime myDateTime = DateTime.Now;
+    string year;
+    int progress;
+
+    protected override void OnInitialized()
+    {
+        year = myDateTime.Year.ToString();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            User = await localStore.GetItemAsync<AdminLogin>("user");
+            await JSRuntime.InvokeAsync<object>("sidenavOpenClose");
+            if (User == null)
+            {
+                NavManager.NavigateTo("/");
+            }
+
+            allOutlets.AddRange((await apiService.GetAllOutlets()).ToList());
+            if (allOutlets.Count() > 0)
+                selectedOutlet = allOutlets[0].OutletId;
+
+            allProducts = new List<Product>();
+            allProducts = (await apiService2.GetAllProducts()).ToList();
+
+            allOutletProducts = (await apiService2.GetAllProductsByOutletId(selectedOutlet)).ToList();
+            GetOutletProducts(selectedOutlet);
+
+            StateHasChanged();
+        }
+    }
+
+    private async void GetOutletProducts(int outletId)
+    {
+        if (outletId == 0)
+        {
+            foreach (var outlet in allOutlets)
+            {
+                var oProducts = (await apiService2.GetAllProductsByOutletId(outlet.OutletId)).ToList();
+                foreach (var oProduct in oProducts)
+                {
+                    var outletProduct = new OutletProduct();
+                    outletProduct.OutletId = outlet.OutletId;
+                    outletProduct.ItemId = oProduct.productId;
+                    outletProduct.CurrentStock = oProduct.CurrentStock;
+                    outletProduct.UnitPrice = oProduct.SellingPrice;
+                    outletProduct.product = oProduct;
+                    outletProductsNew.Add(outletProduct);
+                }
+            }
+        }
+        else
+        {
+            var oProducts = (await apiService2.GetAllProductsByOutletId(outletId)).ToList();
+            foreach (var oProduct in oProducts)
+            {
+                var outletProduct = new OutletProduct();
+                outletProduct.OutletId = outletId;
+                outletProduct.ItemId = oProduct.productId;
+                outletProduct.CurrentStock = oProduct.CurrentStock;
+                outletProduct.UnitPrice = oProduct.SellingPrice;
+                outletProduct.product = oProduct;
+                outletProductsNew.Add(outletProduct);
+            }
+        }
+        StateHasChanged();
+    }
+
+
+    public void Export(string type)
+    {
+        ExcelDownloadForReports_T exceldownload = new ExcelDownloadForReports_T();
+        exceldownload.ReportRenewalReportInvoice1(outletProductsNew, JSRuntime);
+    }
+
+    private void Edit(int productId)
+    {
+        editProduct = allOutletProducts.Where(a => a.productId == productId).FirstOrDefault();
+        isUpdate = true;
+        stock = editProduct.CurrentStock;
+        selectedProduct = productId;
+    }
+
+    private void OnChange(object args)
+    {
+        editProduct = null;
+        editProduct = allOutletProducts.Where(a => a.productId == Convert.ToInt32(args.ToString())).FirstOrDefault();
+        if (editProduct != null)
+        {
+            isUpdate = true;
+            stock = editProduct.CurrentStock;
+        }
+        else
+        {
+            isUpdate = false;
+            stock = 0;
+        }
+        StateHasChanged();
+    }
+
+    private async void AddItem()
+    {
+        if (selectedProduct > 0 && stock >= 0)
+        {
+            var product = allProducts.Where(a => a.productId == selectedProduct).FirstOrDefault();
+            OutletItem outletItem = new OutletItem();
+            outletItem.OutletId = selectedOutlet;
+            outletItem.ItemId = selectedProduct;
+            outletItem.CurrentStock = stock;
+            outletItem.UnitPrice = product.SellingPrice;
+            await apiService2.AddOutletItem(outletItem);
+            Clear();
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Outlet item added!");
+        }
+        else
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Please select an item!");
+        }
+    }
+
+    private async void UpdateItem()
+    {
+        OutletItem outletItem = new OutletItem();
+        outletItem.OutletId = selectedOutlet;
+        outletItem.ItemId = editProduct.productId;
+        outletItem.CurrentStock = stock;
+        outletItem.UnitPrice = editProduct.SellingPrice;
+        await apiService2.UpdateOutletItem(outletItem);
+        Clear();
+        await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Outlet item updated!");
+    }
+
+    private async void Clear()
+    {
+        isUpdate = false;
+        stock = 0;
+        selectedProduct = 0;
+        allProducts = new List<Product>();
+        allProducts = (await apiService2.GetAllProducts()).ToList();
+        allOutletProducts = new List<Product>();
+        allOutletProducts = (await apiService2.GetAllProductsByOutletId(selectedOutlet)).ToList();
+        outletProductsNew = new List<OutletProduct>();
+        GetOutletProducts(selectedOutlet);
+        StateHasChanged();
+    }
+}

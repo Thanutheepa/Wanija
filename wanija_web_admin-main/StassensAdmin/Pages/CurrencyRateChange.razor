@@ -1,0 +1,379 @@
+﻿@page "/CurrencyRateChange"
+@inject IJSRuntime JSRuntime
+@inject IApiService ApiService
+@inject IApiService ApiService2
+@inject IApiService ApiService3
+@inject IApiService ApiService4
+@inject IApiService ApiService5
+@inject IApiService ApiService6
+@inject IApiService ApiService7
+@inject IApiService ApiService8
+
+
+<SideMenu activeValue="CurrencyRateChange" />
+
+
+
+<div id="main">
+
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Currency Rate Change</h3>
+                </div>
+                <div class="col-12 col-md-6 order-md-2 order-first">
+                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            @if (isUpdate)
+                            {
+                                <h4 class="card-title">Update Currency Rate</h4>
+                            }
+                            else
+                            {
+                                <h4 class="card-title">New Currency Rate</h4>
+                            }
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Currency Type <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <RadzenDropDown Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" @bind-value="CurrencyType" AllowClear="true" Data="@currencyTypes" TValue="string" TextProperty="CurrencyType" ValueProperty="CurrencyType" Placeholder="Currency Type" AllowFiltering="true" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Effective Date <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="date" class="form-control form-control-sm" @bind-value="EffectiveDate"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Buying Rate <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="BuyingRate"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Selling Rate <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="SellingRate"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Currency Symbol <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="CurrencySymbol"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm"></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12 justify-content-end">
+                                        @if (isUpdate)
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="UpdateCurrencyRate">Update</button>
+                                            <button type="reset" class="btn btn-light-secondary " @onclick="cancel">Cancel</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="AddCurrencyRate">Save</button>
+                                            <button type="reset" class="btn btn-light-secondary " @onclick="clear">Clear</button>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h4 class="card-title">Existing Currency Rate</h4>
+                        </div>
+                       
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 my-2">
+                                        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                                                        Data="@currencyRates" TItem="CurrencyRate" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                            <Columns>
+                                                <RadzenDataGridColumn TItem="CurrencyRate" Property="CurrencyType" Title="Currency Type" Width="150px" />
+                                                <RadzenDataGridColumn TItem="CurrencyRate" Property="EffectiveDate" Title="Effective Date" Width="150px" />
+                                                <RadzenDataGridColumn TItem="CurrencyRate" Property="BuyingRate" Title="Buying Rate" Width="150px" />
+                                                <RadzenDataGridColumn TItem="CurrencyRate" Property="SellingRate" Title="Selling Rate" Width="150px" />
+                                                <RadzenDataGridColumn TItem="CurrencyRate" Property="CurrencySymbol" Title="Symbol" Width="150px" />
+                                                <RadzenDataGridColumn TItem="CurrencyRate" Title="Action" Context="currencyRates" Width="150px">
+                                                    <Template>
+                                                        <RadzenButton Size="ButtonSize.Medium" Style="display:block; width:110px; margin-bottom:10px;" Click=@(args => Edit(currencyRates.Id)) Text="Edit" ButtonStyle="ButtonStyle.Primary" />
+
+                                                        <RadzenButton Size="ButtonSize.Medium" Style="display:block; width:110px; margin-top:10px" Click=@(args => Delete(currencyRates.Id)) Text="Delete" ButtonStyle="ButtonStyle.Secondary" />
+                                                    </Template>
+
+                                                </RadzenDataGridColumn>
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>@year &copy; MSL Admin</p>
+                </div>
+                <div class="float-end">
+                    <p>
+                        Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+
+
+    </div>
+</div>
+
+@code {
+
+    //Footer Date
+    DateTime myDateTime = DateTime.Now;
+    string year;
+
+    private bool isUpdate { get; set; } = false;
+    private string CurrencyType { get; set; }
+    private DateTime EffectiveDate { get; set; } = DateTime.Now;
+    private double BuyingRate { get; set; }
+    private double SellingRate { get; set; }
+    private string CurrencySymbol { get; set; }
+    private string msg { get; set; }
+
+    private bool exist { get; set; }
+
+
+
+    CurrencyRate newCurrencyRate = new CurrencyRate();
+    CurrencyRate editOne = new CurrencyRate();
+
+
+
+
+    private IEnumerable<CurrencyTypes> currencyTypes { get; set; }
+    private IEnumerable<CurrencyRate> currencyRates { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        year = myDateTime.Year.ToString();
+
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            currencyTypes = (await ApiService.GetCurrencyType()).ToList();
+            currencyRates = (await ApiService2.GetAllRates()).ToList();
+            StateHasChanged();
+            exist = currencyRates.Any(a => (a.EffectiveDate).Year.ToString() == year);
+            StateHasChanged();
+
+
+        }
+    }
+
+    void ChangeBound(object value, string name)
+    {
+        if (CurrencyType == "LKR")
+        { CurrencySymbol = "Rs.";
+            BuyingRate = 1;
+            SellingRate = 1;
+        }
+        else if (CurrencyType == "USD")
+        { CurrencySymbol = "$";
+            BuyingRate = 0;
+            SellingRate = 0;
+        }
+
+        StateHasChanged();
+
+    }
+
+
+
+
+
+
+
+    private async void AddCurrencyRate()
+    {
+        newCurrencyRate.CurrencyType = CurrencyType;
+        newCurrencyRate.EffectiveDate = EffectiveDate;
+        newCurrencyRate.BuyingRate = BuyingRate;
+        newCurrencyRate.SellingRate = SellingRate;
+        newCurrencyRate.CurrencySymbol = CurrencySymbol;
+
+
+
+
+
+        if (CurrencySymbol == null || CurrencyType == null || BuyingRate < 1 || SellingRate < 1)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+        }
+
+        else if(exist)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Allready Rate Created Today");
+        }
+
+        else
+        {
+            msg = await ApiService3.AddCurrencyRate(newCurrencyRate);
+            currencyRates = (await ApiService4.GetAllRates()).ToList();
+            StateHasChanged();
+            clear();
+            StateHasChanged();
+            if (msg == "\"Rate created successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Rate created successfully.");
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+            }
+        }
+
+
+
+    }
+
+    private async void UpdateCurrencyRate()
+    {
+        newCurrencyRate.Id = editOne.Id;
+        newCurrencyRate.CurrencyType = CurrencyType;
+        newCurrencyRate.EffectiveDate = EffectiveDate;
+        newCurrencyRate.BuyingRate = BuyingRate;
+        newCurrencyRate.SellingRate = SellingRate;
+        newCurrencyRate.CurrencySymbol = CurrencySymbol;
+
+        if (CurrencySymbol == null || CurrencyType == null || BuyingRate < 1 || SellingRate < 1)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+        }
+        else
+        {
+            msg = await ApiService5.UpdateRate(newCurrencyRate);
+            currencyRates = (await ApiService6.GetAllRates()).ToList();
+            StateHasChanged();
+            clear();
+            StateHasChanged();
+            if (msg == "\"Rate updated successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Rate updated successfully.");
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+            }
+        }
+
+
+    }
+
+    private void clear()
+    {
+        CurrencyType = null;
+        EffectiveDate = DateTime.Now;
+        BuyingRate = 0;
+        SellingRate = 0;
+        CurrencySymbol = null;
+
+    }
+
+    private void cancel()
+    {
+        isUpdate = false;
+        clear();
+    }
+
+    private async void Delete(int id)
+    {
+        msg = await ApiService7.DeleteRate(id);
+        currencyRates = (await ApiService8.GetAllRates()).ToList();
+        StateHasChanged();
+
+        if (msg == "\"Rate Deleted successfully.\"")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Rate Deleted successfully.");
+        }
+        else
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+        }
+
+    }
+
+    private void Edit(int currencyrateId)
+    {
+        clear();
+        isUpdate = true;
+
+        editOne = currencyRates.Where(a => a.Id == currencyrateId).FirstOrDefault();
+
+
+        CurrencyType = editOne.CurrencyType;
+        EffectiveDate = DateTime.Now;
+        BuyingRate = editOne.BuyingRate;
+        SellingRate = editOne.SellingRate;
+        CurrencySymbol = editOne.CurrencySymbol;
+
+    }
+
+
+
+
+}

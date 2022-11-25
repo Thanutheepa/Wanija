@@ -1,0 +1,319 @@
+﻿@page "/gallery"
+
+@inject IJSRuntime JSRuntime
+@inject IApiService apiService
+@inject IApiService apiService2
+@inject IFileUpload fileUpload
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+@inject IConfiguration Configuration
+
+<SideMenu activeValue="gallery" />
+
+<div id="main">
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Gallery</h3>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="form-group mb-4">
+                                <label for="title">Album Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control w-100" @bind-value="title" placeholder="Enter title" id="title">
+                            </div>
+                            <label>Main Image <span class="text-danger">*</span></label><br />
+                            <InputFile OnChange="fileChange" class="mb-4" />
+                            @if (mainUploadStatus == 1 && appSettingsApi != null)
+                            {
+                                <img src="@appSettingsApi.websiteLink/images/galleryImages/@imageName" class="blogMainImg mb-4" />
+                            }
+                            <br />
+                            <label>Other Images</label><br />
+                            <InputFile OnChange="fileChange2" multiple class="mb-4" />
+
+                            @if (uploadingStatus == 0)
+                            {
+                                <img src="images/Loading.gif" width="100px" />
+                            }
+
+                            @if (otherUploadStatus == 1)
+                            {
+                                <div class="row">
+                                    @foreach (var bImg in galleryImages)
+                                    {
+                                        <div class="col-6 col-md-4 col-lg-3">
+                                            <img src="@bImg.imagePath" class="blogMainImgSmall mb-2" /><br />
+                                            <button class="btn btn-danger" @onclick="()=>DeleteImage(bImg.imagePath)">Delete</button>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            <br />
+                            <button class="btn btn-success" @onclick="AddPost">Upload</button>
+
+                        </div>
+                        
+                            <div class="card-header">
+                                <h4 class="card-title">Existing Galleries @allGallery.Count()</h4>
+                            </div>
+
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-12 my-2">
+                                            @if (allGallery.Count > 0)
+                                            {
+                                                <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true"
+                                                                Data="@allGallery" TItem="Gallery" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                                    <Columns>
+                                                        <RadzenDataGridColumn TItem="Gallery" Property="Title" Title="Title" />
+                                                        <RadzenDataGridColumn TItem="Gallery" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px">
+                                                            <Template Context="data">
+                                                                <RadzenImage Path="@data.mainImage" style="width: 60px; height: 60px; border-radius: 8px;" />
+                                                            </Template>
+                                                        </RadzenDataGridColumn>
+                                                        <RadzenDataGridColumn TItem="Gallery" Title="Action" Context="gallery">
+                                                            <Template>
+                                                                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Delete(gallery)) Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+                                                            </Template>
+
+                                                        </RadzenDataGridColumn>
+                                                    </Columns>
+                                                </RadzenDataGrid>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+@code {
+
+    private string status { get; set; } = "";
+    private bool isUpdate { get; set; } = false;
+    private string title { get; set; } = "";
+    private string imageName { get; set; } = "";
+    private int mainUploadStatus { get; set; } = 0;
+    private int otherUploadStatus { get; set; } = 0;
+    private int uploadingStatus { get; set; } = -1;
+    IFileListEntry file;
+    IFileListEntry[] otherFiles;
+    private List<GalleryItem> galleryImages { get; set; } = new List<GalleryItem>();
+
+    private List<Gallery> allGallery{ get; set; } = new List<Gallery>();
+
+
+    private AdminLogin User { get; set; }
+
+    DateTime myDateTime = DateTime.Now;
+    string year;
+    int progress;
+
+    AppSettingsApi appSettingsApi { get; set; }
+
+    protected override void OnInitialized()
+    {
+        year = myDateTime.Year.ToString();
+        appSettingsApi = Configuration.GetSection("ApiLinks").Get<AppSettingsApi>();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeAsync<object>("sidenavOpenClose");
+            User = await localStore.GetItemAsync<AdminLogin>("user");
+            allGallery = new List<Gallery>();
+            allGallery = (await apiService.GetAllGalleries()).ToList();
+            if (User == null)
+            {
+                NavManager.NavigateTo("/");
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async void fileChange(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+        imageName = file.Name;
+        mainUploadStatus = await UploadFile();
+        StateHasChanged();
+    }
+
+    private async void fileChange2(IFileListEntry[] files)
+    {
+        otherFiles = null;
+        otherFiles = files;
+        uploadingStatus = 0;
+        int status = await UploadFiles2();
+        foreach (var file in files)
+        {
+            var bImg = new GalleryItem();
+            bImg.imagePath = appSettingsApi.websiteLink + "/images/galleryImages/" + file.Name;
+
+            galleryImages.Add(bImg);
+        }
+        otherUploadStatus = status;
+        uploadingStatus = status;
+        StateHasChanged();
+    }
+
+    private async void DeleteImage(string path)
+    {
+        var delImg = galleryImages.Where(a => a.imagePath == path).FirstOrDefault();
+        galleryImages.Remove(delImg);
+        string delPath = path.Replace(appSettingsApi.websiteLink, "");
+        string fileName = delPath.Replace("/images/galleryImages/", "");
+        await fileUpload.DeleteGalleryAsync(fileName);
+        StateHasChanged();
+    }
+
+    private async Task<int> UploadFile()
+    {
+        if (file != null)
+        {
+            mainUploadStatus = 0;
+            string contentType = file.Type;
+
+            string[] extension = file.Name.Split('.');
+
+            if (!extension[extension.Length - 1].ToLower().Equals("jpg") && !extension[extension.Length - 1].ToLower().Equals("jpeg") && !extension[extension.Length - 1].ToLower().Equals("png"))
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid File Type!");
+                return 0;
+            }
+            else
+            {
+                @*     if (File.Exists(curFile))
+                    {
+                        File.Delete(curFile);
+                    }*@
+            await fileUpload.UploadGalleryAsync(file);
+            return 1;
+
+        }
+        //return 1;
+
+    }
+    return 0;
+}
+
+private async Task<int> UploadFiles2()
+{
+    if (otherFiles != null)
+    {
+        foreach (var file in otherFiles)
+        {
+
+            string contentType = file.Type;
+
+            string[] extension = file.Name.Split('.');
+
+            if (!extension[extension.Length - 1].ToLower().Equals("jpg") && !extension[extension.Length - 1].ToLower().Equals("jpeg") && !extension[extension.Length - 1].ToLower().Equals("png"))
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid File Type!");
+            }
+            else
+            {
+                //string curFile = fileUpload.FilePathSlip(file);
+
+                await fileUpload.UploadGalleryAsync(file);
+
+            }
+
+        }
+        return 1;
+    }
+    return 0;
+}
+
+private async void AddPost()
+{
+    if (imageName == "" || title == "")
+    {
+        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+    }
+    else
+    {
+        Gallery gallery = new Gallery();
+        gallery.Title = title.Replace("'", "''");
+        gallery.mainImage = appSettingsApi.websiteLink + "/images/galleryImages/" + imageName;
+
+        FullGallery fullGallery = new FullGallery();
+        fullGallery.gallery = gallery;
+        fullGallery.galleryImages = galleryImages;
+        await apiService2.AddGallery(fullGallery);
+        await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Gallery Added Successfully!");
+        Clear();
+    }
+}
+
+private async void Delete(Gallery gallery)
+{
+    bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure?");
+    if (confirmed)
+    {
+        String stat = await apiService.DeleteGallery(gallery.galleryId);
+        if (stat == "\"Gallery Deleted successfully.\"")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Deleted!");
+            Clear();
+        }
+        else
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+    }
+}
+
+private async void Clear()
+{
+    mainUploadStatus = 0;
+    otherUploadStatus = 0;
+    file = null;
+    otherFiles = null;
+    imageName = null;
+    title = "";
+    galleryImages = new List<GalleryItem>();
+    allGallery = new List<Gallery>();
+    allGallery = (await apiService.GetAllGalleries()).ToList();
+    StateHasChanged();
+}
+
+}

@@ -1,0 +1,634 @@
+﻿@page "/promotion"
+
+@inject IJSRuntime JSRuntime
+@inject IApiService apiService
+@inject IFileUpload fileUpload
+
+@using OfficeOpenXml;
+
+<SideMenu activeValue="promotion" />
+
+<div id="main">
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Promotions</h3>
+                </div>
+                <div class="col-12 col-md-6 order-md-2 order-first">
+                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Promotions</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            @if (isUpdate)
+                            {
+                                <h4 class="card-title">Update Promotion</h4>
+                            }
+                            else
+                            {
+                                <h4 class="card-title">New Promotion</h4>
+                            }
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Promo Code <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="promoCode"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Description <span class="text-danger"></span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><textarea class="form-control form-control-sm" @bind="description"></textarea></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Flat Rate <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <RadzenRadioButtonList @bind-Value=@flatRate TValue="int" Change="@((args) => FlatRateChange(args))">
+                                            <Items>
+                                                <RadzenRadioButtonListItem Text="Yes" Value=1 />
+                                                <RadzenRadioButtonListItem Text="No" Value=0 />
+                                            </Items>
+                                        </RadzenRadioButtonList>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Discount Amount <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="number" class="form-control form-control-sm" disabled=@disAmountStatus @bind-value="disAmount"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Discount Rate <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="number" disabled=@disRateStatus class="form-control form-control-sm" @bind-value="disRate"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Min Order Amount <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="number" class="form-control form-control-sm" @bind-value="minOrder"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Max Order Amount <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="number" class="form-control form-control-sm" @bind-value="maxOrder"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Start Date <span class="text-danger"></span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="date" class="form-control form-control-sm" @bind-value="startDate"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">End Date <span class="text-danger"></span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="date" class="form-control form-control-sm" @bind-value="endDate"></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Is Active <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <RadzenRadioButtonList @bind-Value=@active TValue="int">
+                                            <Items>
+                                                <RadzenRadioButtonListItem Text="Yes" Value="1" />
+                                                <RadzenRadioButtonListItem Text="No" Value="0" />
+                                            </Items>
+                                        </RadzenRadioButtonList>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Is One Time <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <RadzenRadioButtonList @bind-Value=@oneTime TValue="int">
+                                            <Items>
+                                                <RadzenRadioButtonListItem Text="Yes" Value="1" />
+                                                <RadzenRadioButtonListItem Text="No" Value="0" />
+                                            </Items>
+                                        </RadzenRadioButtonList>
+                                    </div>
+                                    @if (isUpdate)
+                                    {
+                                        <div class="col-md-3 col-12">
+                                            <div class="form-group"><label class="form-control-sm">Usage Count <span class="text-danger"></span></label></div>
+                                        </div>
+                                        <div class="col-md-3 col-12">
+                                            <div class="form-group"><input type="number" class="form-control form-control-sm" @bind-value="usageCount"></div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm"></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12 justify-content-end">
+                                        @if (isUpdate)
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="UpdatePromotion">Update</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-primary  me-1" @onclick="AddPromotion">Save</button>
+                                        }
+                                        <button type="reset" class="btn btn-light-secondary" @onclick="Clear">Reset</button>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12 my-3">
+                                        <h5>Upload Excel</h5>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <a href="/excelTemplate/Template.xlsx"><button class="btn btn-secondary"><i class="fas fa-download"></i> Download Excel Template</button></a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group"><InputFile OnChange="btnView_Click" /></div>
+                                        @if (file != null)
+                                        {
+                                            <p>@file.Name</p>
+                                        }
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-primary" @onclick="HandleOpen"><i class="fas fa-upload"></i> Upload Pomotions</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-header">
+                            <h4 class="card-title">Existing Promotions</h4>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 my-2">
+                                        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true"
+                                                        Data="@discountList" TItem="Discount" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                            <Columns>
+                                                <RadzenDataGridColumn TItem="Discount" Property="PromoCode" Title="Promo Code" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="IsFlatRate" Title="Is Flat" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="DiscountAmount" Title="Dis. Amount" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="DiscountRate" Title="Dis. Rate" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="MinOrderAmount" Title="Min Order" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="MaxOrderAmount" Title="Max Order" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="IsActive" Title="Is Active" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="IsOneTime" Title="Is One Time" />
+                                                <RadzenDataGridColumn TItem="Discount" Property="UsageCount" Title="Usage Count" />
+                                                <RadzenDataGridColumn TItem="Discount" Title="Action" Context="discount">
+                                                    <Template>
+                                                        <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Edit(discount)) Text="Edit" ButtonStyle="ButtonStyle.Secondary" />
+                                                    </Template>
+
+                                                </RadzenDataGridColumn>
+                                                <RadzenDataGridColumn TItem="Discount" Title="Action" Context="discount">
+                                                    <Template>
+                                                        <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Delete(discount)) Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+                                                    </Template>
+
+                                                </RadzenDataGridColumn>
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+
+    private bool isUpdate { get; set; } = false;
+    private string promoCode { get; set; } = "";
+    private string description { get; set; } = "";
+    private int flatRate { get; set; } = 0;
+    private int active { get; set; } = 1;
+    private int oneTime { get; set; } = 0;
+    private double disAmount { get; set; } = 0;
+    private double disRate { get; set; } = 0;
+    private double minOrder { get; set; } = 0;
+    private double maxOrder { get; set; } = 0;
+    private int usageCount { get; set; } = 0;
+    private bool disAmountStatus { get; set; } = true;
+    private bool disRateStatus { get; set; } = false;
+    private int unsuccess = 0;
+    private string errormsg = "";
+    private int rowcount = 0;
+    private int colcount = 0;
+
+    private Discount updateItem { get; set; }
+
+    private List<Discount> discountList { get; set; }
+
+    IFileListEntry file;
+
+
+    DateTime myDateTime = DateTime.Now;
+    private DateTime startDate { get; set; } = DateTime.Now;
+    private DateTime endDate { get; set; } = DateTime.Now;
+
+    string year;
+
+    protected override void OnInitialized()
+    {
+        year = myDateTime.Year.ToString();
+    }
+
+    private void btnView_Click(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+    }
+
+    private async Task Upload()
+    {
+        if (file != null)
+        {
+
+            string contentType = file.Type;
+            List<string> excelContentTypes = new List<string>
+{
+                        "application/kset",
+                        "application/vnd.ms-excel",//xls
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"//xlsx
+            };
+
+            string[] extension = file.Name.Split('.');
+
+            if (!extension[extension.Length - 1].ToLower().Equals("xlsx") && !extension[extension.Length - 1].ToLower().Equals("xls"))
+            {
+                errormsg = "Please choose a valid excel file";
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", errormsg);
+                unsuccess = 1;
+            }
+            else
+            {
+                if (!excelContentTypes.Exists(a => a.Equals(contentType.ToLower())))
+                {
+                    errormsg = "Please choose a valid excel file";
+                    await JSRuntime.InvokeAsync<object>("Alert", "error", "", errormsg);
+                    unsuccess = 1;
+                }
+                else
+                {
+                    string curFile = fileUpload.FilePath(file);
+
+                    await fileUpload.UploadAsync(file);
+                }
+
+            }
+
+        }
+        else
+        {
+            errormsg = "Please choose a file to upload.";
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", errormsg);
+            unsuccess = 1;
+        }
+    }
+
+    private async void HandleOpen()
+    {
+        unsuccess = 0;
+        await Upload();
+        List<Discount> excelDiscounts = new List<Discount>();
+        if (unsuccess == 0)
+        {
+            string FilePath = fileUpload.FilePath(file);
+            System.IO.FileInfo existingfile = new System.IO.FileInfo(FilePath);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (ExcelPackage package = new ExcelPackage(existingfile))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                colcount = worksheet.Dimension.End.Column;
+                rowcount = worksheet.Dimension.End.Row;
+
+                int stat = 1;
+
+                for (int row = 2; row <= rowcount; row++)
+                {
+
+                    //string d = worksheet.Cells[row, col].Value.ToString();
+                    Discount discount = new Discount();
+                    discount.PromoCode = worksheet.Cells[row, 1].Value.ToString();
+                    discount.Description = worksheet.Cells[row, 2].Value.ToString();
+                    if(Convert.ToInt32(worksheet.Cells[row, 3].Value) != 0 && Convert.ToInt32(worksheet.Cells[row, 3].Value) != 1)
+                    {
+                        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid Is_Flat value found. (1 and 0 Only)");
+                        stat = 0;
+                        break;
+                    }
+                    else
+                    {
+                        discount.IsFlatRate = Convert.ToInt32(worksheet.Cells[row, 3].Value);
+                    }
+                    if(!Double.TryParse(worksheet.Cells[row, 4].Value.ToString(), out double n))
+                    {
+                        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Discount Amount Should be a Number");
+                        stat = 0;
+                        break;
+                    }
+                    else
+                    {
+                        discount.DiscountAmount = Convert.ToInt32(worksheet.Cells[row, 4].Value);
+                    }
+                    if(!Double.TryParse(worksheet.Cells[row, 5].Value.ToString(), out double n2))
+                    {
+                        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Discount Rate Should be a Number");
+                        stat = 0;
+                        break;
+                    }
+                    else
+                    {
+                        discount.DiscountRate = Convert.ToInt32(worksheet.Cells[row, 5].Value);
+                    }
+                    if(!Double.TryParse(worksheet.Cells[row, 6].Value.ToString(), out double n3) || !Double.TryParse(worksheet.Cells[row, 7].Value.ToString(), out double n4))
+                    {
+                        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Min Order Amount and Max Order Amount Should be a Number");
+                        stat = 0;
+                        break;
+                    }
+                    else
+                    {
+                        discount.MinOrderAmount = Convert.ToInt32(worksheet.Cells[row, 6].Value);
+                        discount.MaxOrderAmount = Convert.ToInt32(worksheet.Cells[row, 7].Value);
+                    }
+
+                    discount.StartDate = Convert.ToDateTime(worksheet.Cells[row, 8].Value);
+                    discount.EndDate = Convert.ToDateTime(worksheet.Cells[row, 9].Value);
+
+                    if (Convert.ToInt32(worksheet.Cells[row, 10].Value) != 0 && Convert.ToInt32(worksheet.Cells[row, 10].Value) != 1)
+                    {
+                        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid Is_Active value found. (1 and 0 Only)");
+                        stat = 0;
+                        break;
+                    }
+                    else
+                    {
+                        discount.IsActive = Convert.ToInt32(worksheet.Cells[row, 10].Value);
+                    }
+
+                    if (Convert.ToInt32(worksheet.Cells[row, 11].Value) != 0 && Convert.ToInt32(worksheet.Cells[row, 11].Value) != 1)
+                    {
+                        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid Is_One_Time value found. (1 and 0 Only)");
+                        stat = 0;
+                        break;
+                    }
+                    else
+                    {
+                        discount.IsOneTime = Convert.ToInt32(worksheet.Cells[row, 11].Value);
+                    }
+
+                    excelDiscounts.Add(discount);
+
+                }
+                if(stat == 1)
+                {
+                    int success = 0;
+                    int fail = 0;
+                    foreach(var dis in excelDiscounts)
+                    {
+                        String res = await apiService.AddNewDiscount(dis);
+                        if (res == "\"Discount Added successfully.\"")
+                            success++;
+                        else
+                            fail++;
+                    }
+                    await JSRuntime.InvokeAsync<object>("Alert", "", "", "Success Count: "+success + ". Fail Count: "+fail);
+                    Clear();
+                }
+            }
+
+            StateHasChanged();
+        }
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //await JSRuntime.InvokeAsync<object>("Charts");
+            discountList = new List<Discount>();
+            discountList = (await apiService.GetDiscounts()).ToList();
+            await JSRuntime.InvokeAsync<object>("sidenavOpenClose");
+            StateHasChanged();
+        }
+    }
+
+    private async void FlatRateChange(int val)
+    {
+        if (val == 1)
+        {
+            disAmountStatus = false;
+            disRateStatus = true;
+            disRate = 0;
+        }
+        else
+        {
+            disAmountStatus = true;
+            disRateStatus = false;
+            disAmount = 0;
+        }
+    }
+
+    private async void AddPromotion()
+    {
+        if (promoCode == "")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required fields cannot be blank!");
+        }
+        else if (disRate < 0 || disAmount < 0 || minOrder < 0 || maxOrder < 0)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "All numbers should be greater than or equal to 0");
+        }
+        else if (maxOrder < minOrder)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Max order valu should be greater than min order value");
+        }
+        else
+        {
+            Discount discount = new Discount();
+            discount.PromoCode = promoCode;
+            discount.Description = description;
+            discount.IsFlatRate = flatRate;
+            discount.DiscountAmount = disAmount;
+            discount.DiscountRate = disRate;
+            discount.MinOrderAmount = minOrder;
+            discount.MaxOrderAmount = maxOrder;
+            discount.StartDate = startDate;
+            discount.EndDate = endDate;
+            discount.IsActive = active;
+            discount.IsOneTime = oneTime;
+            discount.UsageCount = 0;
+
+            String stat = await apiService.AddNewDiscount(discount);
+            if (stat == "\"Discount Added successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Added!");
+                Clear();
+            }
+            else
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+        }
+    }
+    private async void UpdatePromotion()
+    {
+        if (promoCode == "")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid Promo Code");
+        }
+        else if (disRate < 0 || disAmount < 0 || minOrder < 0 || maxOrder < 0)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "All numbers should be greater than or equal to 0");
+        }
+        else if (maxOrder < minOrder)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Max order valu should be greater than min order value");
+        }
+        else
+        {
+            Discount discount = new Discount();
+            discount.PromoCode = promoCode;
+            discount.Description = description;
+            discount.IsFlatRate = flatRate;
+            discount.DiscountAmount = disAmount;
+            discount.DiscountRate = disRate;
+            discount.MinOrderAmount = minOrder;
+            discount.MaxOrderAmount = maxOrder;
+            discount.StartDate = startDate;
+            discount.EndDate = endDate;
+            discount.IsActive = active;
+            discount.IsOneTime = oneTime;
+            discount.UsageCount = usageCount;
+            discount.DiscountId = updateItem.DiscountId;
+
+            String stat = await apiService.UpdateDiscount(discount);
+            if (stat == "\"Discount Updated successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Updated!");
+                Clear();
+            }
+            else
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+        }
+    }
+
+    private void Edit(Discount discount)
+    {
+        isUpdate = true;
+        updateItem = discount;
+        promoCode = discount.PromoCode;
+        description = discount.Description;
+        flatRate = discount.IsFlatRate;
+        disAmount = discount.DiscountAmount;
+        disRate = discount.DiscountRate;
+        minOrder = discount.MinOrderAmount;
+        maxOrder = discount.MaxOrderAmount;
+        startDate = discount.StartDate;
+        endDate = discount.EndDate;
+        active = discount.IsActive;
+        oneTime = discount.IsOneTime;
+        usageCount = discount.UsageCount;
+        if (flatRate == 1)
+        {
+            disAmountStatus = false;
+            disRateStatus = true;
+            disRate = 0;
+        }
+        else
+        {
+            disAmountStatus = true;
+            disRateStatus = false;
+            disAmount = 0;
+        }
+    }
+
+    private async void Delete(Discount discount)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure?");
+        if (confirmed)
+        {
+            String stat = await apiService.DeleteDiscount(discount);
+            if (stat == "\"Discount Deleted successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Deleted!");
+                Clear();
+            }
+            else
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+        }
+    }
+
+    private async void Clear()
+    {
+        isUpdate = false;
+        promoCode = "";
+        description = "";
+        flatRate = 0;
+        active = 1;
+        oneTime = 0;
+        disAmount = 0;
+        disRate = 0;
+        minOrder = 0;
+        maxOrder = 0;
+        usageCount = 0;
+        disAmountStatus = true;
+        disRateStatus = false;
+        startDate = DateTime.Now;
+        endDate = DateTime.Now;
+        discountList = new List<Discount>();
+        discountList = (await apiService.GetDiscounts()).ToList();
+        file = null;
+        unsuccess = 0;
+        errormsg = "";
+        rowcount = 0;
+        colcount = 0;
+        StateHasChanged();
+    }
+
+}

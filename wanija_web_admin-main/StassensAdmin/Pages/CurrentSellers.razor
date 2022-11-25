@@ -1,0 +1,66 @@
+﻿@page "/currentSellers"
+
+<SideMenu activeValue="currentSellers" />
+
+<div id="main">
+    <div class="index-container">
+        <center>
+            <h1 class="display-6 fw-bolder mb-5">Current Sellers List</h1><br />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width:80px;align-items:center;">ID</th>
+                        <th scope="col" style="width:150px;">Name</th>
+                        <th scope="col" style="width:100px;">Phone</th>
+                        <th scope="col" style="width:150px;">Status</th>
+                        <th scope="col" style="width:100px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>076354253</td>
+                        <td>
+                            <label class="my-radio">
+                                <input type="radio" id="" name="status">
+                            </label>
+                            &nbsp;&nbsp; Active
+
+                            <br /><br />
+                            <label class="my-radio">
+                                <input type="radio" id="" name="status">
+                            </label>
+                            &nbsp;&nbsp; In-active
+                        </td>
+                        <td>
+                            <a href="/registerSeller">
+                                <input type="submit" value="View Details" class="secondary-btn" style="width:130px;height:35px;" /><br /><br />
+                            </a>
+                            <input type="submit" value="Edit" class="secondary-btn" style="width:130px;height:35px;" /><br /><br />
+                            <input type="submit" value="Remove" class="secondary-btn" style="width:130px;height:35px;" /><br />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </center>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+@code {
+    string year = DateTime.Now.Year.ToString();
+}

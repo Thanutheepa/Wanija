@@ -1,0 +1,169 @@
+﻿@page "/registerSeller"
+@*seller register form*@
+
+<SideMenu activeValue="" />
+
+<div id="main">
+    <div class="primary-container" style="width:90%">
+        <br />
+        <center>
+            <h3 class="display-6 fw-bolder mb-5">Join with us to sell your product</h3>
+            <div class="form-floating mb-3">
+                <div class="row">
+                    <div class="col ">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="fname" required placeholder="first name" />
+                            <label for="fname">First name</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="name" required placeholder="first name" />
+                            <label for="email">Email</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="address" required placeholder="first name" />
+                            <label for="address">Address</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <label for="floatingSelect">State</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <label for="floatingSelect">Country</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <label for="floatingSelect">Reigon</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="zip" required placeholder="first name" />
+                            <label for="zip">Zip Code</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="password" required placeholder="first name" />
+                            <label for="password">Create Passowrd</label>
+                        </div>
+                        <br />
+
+
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="lname" required placeholder="first name" />
+                            <label for="lname">Last name</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="phone" required placeholder="first name" />
+                            <label for="phone">Phone</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="bankName" required placeholder="first name" />
+                            <label for="bankName">Bank Name</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="accountHolderName" required placeholder="first name" />
+                            <label for="accountHolderName">Bank Account holer's Name</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="nic" required placeholder="first name" />
+                            <label for="nic">NIC</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="accountHolderName" required placeholder="first name" />
+                            <label for="accountHolderName">Bank Account holer's Name</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="branchName" required placeholder="first name" />
+                            <label for="branchName">Branch Name</label>
+                        </div><br />
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="password" required placeholder="first name" />
+                            <label for="password">Confirm Passowrd</label>
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating">
+                        <label class="form-floating">
+                            Upload Bank Statement<br />
+                            <input type="file" id="bankStatement" name="filename">
+                        </label>
+                    </div><br />
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <label class="form-floating">
+                            Upload ID copy Front<br />
+                            <input type="file" id="idFront" name="filename">
+                        </label>
+                    </div><br />
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <label class="form-floating">
+                            Upload ID copy Bakc<br />
+                            <input type="file" id="idBack" name="filename">
+                        </label>
+                    </div><br />
+                </div>
+            </div>
+            <br /><br /><br />
+            <br /><hr style="width:80%;color:gray;line-height:3px"><br /><br />
+
+            <input type="submit" value="Register" class="primary-btn" />
+            <br /><br /><br />
+            <p>Already have an account?<a href="/login"> Login</a></p>
+            <br />
+        </center>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+@code {
+    string year = DateTime.Now.Year.ToString();
+}

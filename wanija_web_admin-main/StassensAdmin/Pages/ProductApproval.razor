@@ -1,0 +1,133 @@
+﻿@page "/ProductApproval"
+
+<SideMenu activeValue="ProductApproval" />
+
+<div id="main">
+    <div class="index-container">
+        <center><h1 class="display-6 fw-bolder mb-5">Product approval Handling</h1></center><br />
+        @*<a href="/currentSellers">
+                <input type="submit" value="Current Sellers list" class="secondary-btn" style="width:200px;height:40px;margin-right:0;" />
+
+            </a>*@
+        <br />
+        <br />
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" style="width:100px;align-items:center;">Seller Id</th>
+                    <th scope="col" style="width:140px;">Product Id</th>
+                    <th scope="col" style="width:100px;">Product Name</th>
+                    <th scope="col" style="width:100px;">Product Category</th>
+                    <th scope="col" style="width:100px;">Current Stock</th>
+                    <th scope="col" style="width:100px;">Selling Price</th>
+                    <th scope="col" style="width:100px;">Actions</th>
+                    <th scope="col" style="width:170px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <center>
+                    <th scope="row">1</th>
+                    <td>1</td>
+                    <td>ABC</td>
+                    <td>Clothing</td>
+                    <td>6</td>
+                    <td>200</td>
+                    <td>
+                        <a href="/CollectionBlazor/FilledAddProductForm">
+                            <input type="submit" value="View" class="primary-btnA" style="width:100px;height:35px;" /><br />
+                        </a>
+                        <a href="/CollectionBlazor/ViewApproveStatus">
+                            <input type="submit" value="Approve" class="primary-btnB" style="width:100px;height:35px;" /><br />
+                        </a>
+                        <a href="/CollectionBlazor/ViewRejectedProductStatus">
+                            <input type="submit" value="Reject" class="primary-btnC" style="width:100px;height:35px;" /><br />
+                        </a>
+                    </td>
+                    @*<td>
+
+                            <input type="submit" value="Reject" class="primary-btn2" style="width:100px;height:35px;" /> <br/>
+                        </td>*@
+                    </center>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .index-container {
+    width: 98%;
+    margin: 10px;
+    margin-bottom: 10px;
+    padding: 80px;
+    align-content: center;
+    min-height: 100vh;
+    max-height: auto;
+    background-color: #fcfbf5;
+    box-shadow: 0 10px 30px 0px rgba(1, 1, 1, 0.3);
+}
+.primary-btnA {
+    color: white;
+    background-color: #FFB554;
+    border:none;
+    width:200px;
+    height:40px;
+    border-radius: 7px;
+}
+/*primary button - yellow */
+.primary-btnB {
+    color: white;
+    background-color: green; @*#FFB554;*@
+    border:none;
+    width:200px;
+    height:40px;
+    border-radius: 7px;
+}
+.primary-btnC {
+    color: white;
+    background-color: red;
+    border:none;
+    width:200px;
+    height:40px;
+    border-radius: 7px;
+}
+/secondaru button - orange/
+.secondary-btn {
+    color: white;
+    background-color: #FF5454;
+    border: none;
+    width: 200px;
+    height: 40px;
+    border-radius: 7px;
+}
+
+/* small box container*/
+.primary-container {
+    max-width: fit-content;
+    min-width:50%;
+    margin: 50px auto;
+    position: relative;
+    box-shadow: 0 10px 30px 0px rgba(2, 2, 2, 0.3);
+    padding: 30px;
+}
+</style>
+
+
+@code {
+    string year = DateTime.Now.Year.ToString();
+}

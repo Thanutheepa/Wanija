@@ -1,0 +1,398 @@
+﻿@page "/blogPosts"
+
+@inject IJSRuntime JSRuntime
+@inject IApiService apiService
+@inject IApiService apiService2
+@inject IFileUpload fileUpload
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+@inject IConfiguration Configuration
+
+<SideMenu activeValue="blog" />
+
+<div id="main">
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>New Blog Post</h3>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <label>Main Image <span class="text-danger">*</span></label><br />
+                            <InputFile OnChange="fileChange" class="mb-4" />
+                            @if (mainUploadStatus == 1 && appSettingsApi != null)
+                            {
+                                <img src="@appSettingsApi.websiteLink/images/blogImages/@imageName" class="blogMainImg mb-4" />
+                            }
+                            <div class="form-group mb-4">
+                                <label for="title">Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control w-100" @bind-value="date">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="title">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control w-100" @bind-value="title" placeholder="Enter title" id="title">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="title">Sub Description</label>
+                                <textarea class="form-control w-100" placeholder="Enter Sub Description" maxlength="500" id="title" @bind="subDescription"></textarea>
+                            </div>
+                            @*<div>
+            @((MarkupString)@EditorHTMLContent)
+        </div>*@
+
+                            <label>Other Images</label><br />
+                            <InputFile OnChange="fileChange2" multiple class="mb-4" />
+
+                            @if (otherUploadStatus == 1)
+                            {
+                                <div class="row">
+                                    @foreach (var bImg in blogImages)
+                                    {
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <img src="@bImg.ImageUrl" class="blogMainImgSmall mb-2" />
+                                                </div>
+                                                <div class="col-8">
+                                                    <p><b>@bImg.TagName</b></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+
+                            <div id="summernote"></div>
+                            <button class="btn btn-secondary" @onclick="GetCode" data-toggle="modal" data-target="#myModal">Post Preview</button>
+                            <button class="btn btn-success" @onclick="AddPost">Submit Post</button>
+
+                        </div>
+
+                        <div class="card-header">
+                            <h4 class="card-title">Existing Posts @allPosts.Count()</h4>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 my-2">
+                                        @if (allPosts.Count > 0)
+                                        {
+                                            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true"
+                                                            Data="@allPosts" TItem="BlogPosts" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                                <Columns>
+                                                    <RadzenDataGridColumn TItem="BlogPosts" Property="Title" Title="Title" />
+                                                    <RadzenDataGridColumn TItem="BlogPosts" Property="CreatedDate" Title="Created Date" />
+                                                    <RadzenDataGridColumn TItem="BlogPosts" Title="Action" Context="blogpost">
+                                                        <Template>
+                                                            <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Delete(blogpost)) Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+                                                        </Template>
+
+                                                    </RadzenDataGridColumn>
+                                                    @*                                                <RadzenDataGridColumn TItem="Function" Title="Action" Context="function">
+                                                            <Template>
+                                                                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => Delete(function.FunctionID)) Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+                                                            </Template>
+
+                                                        </RadzenDataGridColumn>*@
+                                                </Columns>
+                                            </RadzenDataGrid>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Post Preview</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        @if (mainUploadStatus == 1)
+                        {
+                            <img src="images/blogImages/@imageName" class="blogMainImg mb-4" />
+                        }
+                        <h3>@title</h3>
+                        <p>Posted on date, Edited date by Mother Srilanka</p>
+                        <hr />
+                        <div>
+                            @((MarkupString)@htmlResult)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private string status { get; set; } = "";
+    private bool isUpdate { get; set; } = false;
+    private string value { get; set; } = "test";
+    private string title { get; set; } = "";
+    private string subDescription { get; set; } = "";
+    private string htmlResult { get; set; }
+    private string imageName { get; set; } = "";
+    private DateTime date { get; set; } = DateTime.Now;
+    private int mainUploadStatus { get; set; } = 0;
+    private int otherUploadStatus { get; set; } = 0;
+    IFileListEntry file;
+    IFileListEntry[] otherFiles;
+    private List<BlogImage> blogImages { get; set; } = new List<BlogImage>();
+
+    private List<BlogPosts> allPosts { get; set; } = new List<BlogPosts>();
+
+
+    private AdminLogin User { get; set; }
+
+    DateTime myDateTime = DateTime.Now;
+    string year;
+    int progress;
+
+    private string strSavedContent = "";
+    private ElementReference divEditorElement;
+    private string EditorContent;
+    private string EditorHTMLContent;
+    private bool EditorEnabled = true;
+
+    AppSettingsApi appSettingsApi { get; set; }
+
+    protected override void OnInitialized()
+    {
+        year = myDateTime.Year.ToString();
+        appSettingsApi = Configuration.GetSection("ApiLinks").Get<AppSettingsApi>();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //await JSRuntime.InvokeAsync<string>("QuillFunctions.createQuill", divEditorElement);
+            await JSRuntime.InvokeAsync<string>("SummerNote");
+            await JSRuntime.InvokeAsync<object>("sidenavOpenClose");
+            User = await localStore.GetItemAsync<AdminLogin>("user");
+            allPosts = new List<BlogPosts>();
+            allPosts = (await apiService.GetAllBlogPosts()).ToList();
+            if (User == null)
+            {
+                NavManager.NavigateTo("/");
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetCode()
+    {
+        string htmlRes = await JSRuntime.InvokeAsync<string>("GetCodeSummerNote");
+        foreach (var bImg in blogImages)
+        {
+            htmlRes = htmlRes.Replace(bImg.TagName, "<img class='blogImg clickImg'  data-toggle='modal' data-target='#myModal' src='" + bImg.ImageUrl + "' width='100%'>");
+        }
+        htmlResult = htmlRes;
+        StateHasChanged();
+    }
+
+    private async void fileChange(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+        imageName = file.Name;
+        mainUploadStatus = await UploadFile();
+        StateHasChanged();
+    }
+
+    private async void fileChange2(IFileListEntry[] files)
+    {
+        otherFiles = files;
+        blogImages = new List<BlogImage>();
+        int a = 1;
+        int status = await UploadFiles2(); ;
+        foreach (var file in files)
+        {
+            var bImg = new BlogImage();
+            bImg.TagName = "(Image-" + a + ")";
+            bImg.ImageUrl = appSettingsApi.websiteLink+"/images/blogImages/" + file.Name;
+
+            blogImages.Add(bImg);
+            a++;
+            //imagePaths.Add("https://adminpanel-mothersl.melstasoft.com/images/PRODUCT_IMAGES/" + file.Name);
+        }
+        otherUploadStatus = status;
+        StateHasChanged();
+    }
+
+    private async Task<int> UploadFile()
+    {
+        if (file != null)
+        {
+            mainUploadStatus = 0;
+            string contentType = file.Type;
+
+            string[] extension = file.Name.Split('.');
+
+            if (!extension[extension.Length - 1].ToLower().Equals("jpg") && !extension[extension.Length - 1].ToLower().Equals("jpeg") && !extension[extension.Length - 1].ToLower().Equals("png"))
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid File Type!");
+                return 0;
+            }
+            else
+            {
+                @*     if (File.Exists(curFile))
+                    {
+                        File.Delete(curFile);
+                    }*@
+            await fileUpload.UploadBlogAsync(file);
+            return 1;
+
+        }
+        //return 1;
+
+    }
+    return 0;
+}
+
+private async Task<int> UploadFiles2()
+{
+    if (otherFiles != null)
+    {
+        foreach (var file in otherFiles)
+        {
+
+            string contentType = file.Type;
+
+            string[] extension = file.Name.Split('.');
+
+            if (!extension[extension.Length - 1].ToLower().Equals("jpg") && !extension[extension.Length - 1].ToLower().Equals("jpeg") && !extension[extension.Length - 1].ToLower().Equals("png"))
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid File Type!");
+            }
+            else
+            {
+                //string curFile = fileUpload.FilePathSlip(file);
+
+                await fileUpload.UploadBlogAsync(file);
+
+            }
+
+        }
+        return 1;
+    }
+    return 0;
+}
+
+private async void AddPost()
+{
+    await GetCode();
+    if (imageName == "" || title == "" || htmlResult == "" || htmlResult == null)
+    {
+        await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+    }
+    else
+    {
+        var encodedHtmlResult = System.Web.HttpUtility.HtmlEncode(htmlResult);
+        BlogPosts blogPost = new BlogPosts();
+        blogPost.Title = title.Replace("'", "''");
+        blogPost.MainImage = appSettingsApi.websiteLink+"/images/blogImages/" + imageName;
+        blogPost.Description = encodedHtmlResult;
+        if (subDescription != null && subDescription != "")
+        {
+            blogPost.SubDescription = subDescription.Replace("'", "''");
+        }
+        else
+        {
+            blogPost.SubDescription = subDescription;
+        }
+        blogPost.CreatedDate = date.ToString("yyyy/MM/dd");
+        blogPost.EditedDate = date.ToString("yyyy/MM/dd");
+        await apiService2.AddBlogPosts(blogPost);
+
+        //await JSRuntime.InvokeAsync<object>("Alert", "success", "", encodedHtmlResult);
+        await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Post Added Successfully!");
+        Clear();
+    }
+}
+
+private async void Delete(BlogPosts blogPost)
+{
+    bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure?");
+    if (confirmed)
+    {
+        String stat = await apiService.DeletePost(blogPost);
+        if (stat == "\"Post deleted successfully.\"")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Deleted!");
+            Clear();
+        }
+        else
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+    }
+}
+
+private async void Clear()
+{
+    mainUploadStatus = 0;
+    otherUploadStatus = 0;
+    file = null;
+    otherFiles = null;
+    htmlResult = "";
+    imageName = null;
+    title = "";
+    subDescription = "";
+    date = DateTime.Now;
+    blogImages = new List<BlogImage>();
+    await JSRuntime.InvokeAsync<object>("CodeClearSummerNote");
+    allPosts = new List<BlogPosts>();
+    allPosts = (await apiService.GetAllBlogPosts()).ToList();
+    StateHasChanged();
+}
+
+}

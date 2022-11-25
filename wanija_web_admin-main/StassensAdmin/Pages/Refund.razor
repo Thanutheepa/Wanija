@@ -1,0 +1,442 @@
+﻿@page "/refund"
+
+@inject IJSRuntime JSRuntime
+@inject IApiService apiService
+@inject IApiService apiService2
+@inject IPaymentService paymentService
+@inject IFileUpload fileUpload
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+@inject IConfiguration Configuration
+
+<SideMenu activeValue="refund" />
+
+<div id="main">
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Cancel Order & Refund</h3>
+                </div>
+                @*<div class="col-12 col-md-6 order-md-2 order-first">
+                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Items</li>
+                            </ol>
+                        </nav>
+                    </div>*@
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                          @*  @if (isUpdate)
+                            {
+                                <h4 class="card-title">Update Item</h4>
+                            }
+                            else
+                            {
+                                <h4 class="card-title">New Item</h4>
+                            }*@
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Order Id <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input disabled="@isDisabled" type="text" class="form-control form-control-sm" @bind-value="orderId"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm"></label></div>
+                                    </div>
+                                    <div class="col-md-6 col-12 justify-content-end">
+                                        <button type="button" class="btn btn-primary  me-1" @onclick="GetRefundDetails">Get Payment Details</button>
+                                        <button type="button" class="btn btn-secondary  me-1" @onclick="Clear">Reset</button>
+                                    </div>
+
+                                </div>
+                                @if (orderDetials != null)
+                                {
+                                    @if (isRefund == 1 && res != null)
+                                    {
+                                        <div class="row my-4">
+                                            <div class="col-12">
+                                                <h3>Payment Details</h3>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Merchant Category Code</div>
+                                                    <div class="col-6 text-start">@res.merchantCategoryCode</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Authorized Amount</div>
+                                                    <div class="col-6 text-start">Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round(res.totalAuthorizedAmount, 2))).ToString("N")</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Captured Amount</div>
+                                                    <div class="col-6 text-start">Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round(res.totalCapturedAmount, 2))).ToString("N")</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Refunded Amount</div>
+                                                    <div class="col-6 text-start">Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round(res.totalRefundedAmount, 2))).ToString("N")</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Order ID</div>
+                                                    <div class="col-6 text-start">@orderId</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Order Date</div>
+                                                    <div class="col-6 text-start">@res.creationTime.ToString("MMM dd, yyyy")</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Order Last Update Date</div>
+                                                    <div class="col-6 text-start">@res.lastUpdatedTime.ToString("MMM dd, yyyy")</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Payment Method</div>
+                                                    <div class="col-6 text-start">@res.sourceOfFunds.provided.card.brand</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Account Identifier</div>
+                                                    <div class="col-6 text-start">@res.sourceOfFunds.provided.card.number</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Account Holder</div>
+                                                    <div class="col-6 text-start">@res.sourceOfFunds.provided.card.nameOnCard</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Card Expiry Date</div>
+                                                    <div class="col-6 text-start">@res.sourceOfFunds.provided.card.expiry.month/@res.sourceOfFunds.provided.card.expiry.year</div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-6 text-end text-secondary">Funding Method</div>
+                                                    <div class="col-6 text-start">@res.sourceOfFunds.provided.card.fundingMethod</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mt-4">
+                                                <h6>Transactions</h6>
+                                                <table class="table table-bordered" style="width:100%">
+                                                    <tr>
+                                                        <th>Transaction Date</th>
+                                                        <th>Transaction Type</th>
+                                                        <th>Transaction Gateway Response Code</th>
+                                                        <th>Transaction Amount</th>
+                                                    </tr>
+                                                    @foreach (var transaction in res.transaction)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @Convert.ToDateTime(transaction.transaction.acquirer.settlementDate).ToString("MMM dd, yyyy")
+                                                            </td>
+                                                            <td>
+                                                                @transaction.transaction.type
+                                                            </td>
+                                                            <td>
+                                                                @transaction.response.gatewayCode
+                                                            </td>
+                                                            <td>
+                                                                Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round(transaction.transaction.amount, 2))).ToString("N")
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-5">
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group"><label class="form-control-sm"><b>Select Refund Reason <span class="text-danger">*</span></b></label></div>
+                                            </div>
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group">
+                                                    <RadzenDropDown AllowClear="true" TValue="int" Data=@cancelReasons TextProperty="name" ValueProperty="id" Class="w-100" @bind-Value="selectedCancelReason" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group"><label class="form-control-sm"><b>Enter Refund Amount <span class="text-danger">*</span></b></label></div>
+                                            </div>
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group"><input type="text" class="form-control form-control-sm" @bind-value="refundAmount"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-5">
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group"><label class="form-control-sm"></label></div>
+                                            </div>
+                                            <div class="col-md-3 col-12 justify-content-end">
+                                                <button type="button" class="btn btn-primary  me-1" @onclick="RefundPayment">Cancel & Refund</button>
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    @if (isRefund == 0)
+                                    {
+                                        <div class="row mt-5">
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group"><label class="form-control-sm"><b>Select Refund Reason <span class="text-danger">*</span></b></label></div>
+                                            </div>
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group">
+                                                    <RadzenDropDown AllowClear="true" TValue="int" Data=@cancelReasons TextProperty="name" ValueProperty="id" Class="w-100" @bind-Value="selectedCancelReason" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-5">
+                                            <div class="col-md-3 col-12">
+                                                <div class="form-group"><label class="form-control-sm"></label></div>
+                                            </div>
+                                            <div class="col-md-3 col-12 justify-content-end">
+                                                <button type="button" class="btn btn-primary  me-1" @onclick="CancelOrder">Cancel</button>
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    <div class="row my-4">
+                                        <div class="col-12">
+                                            <h3>Order Details</h3>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h6>Shipping Details</h6>
+                                            <table class="table table-bordered" style="width:100%">
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Order Date</th>
+                                                    @*<th>Payment Mode</th>*@
+                                                    <th>Customer Name</th>
+                                                    <th>Customer Address</th>
+                                                    <th>Contact No</th>
+                                                    <th>Total Order Value</th>
+                                                    <th>Payment Type</th>
+                                                    <th>Outlet</th>
+                                                    <th>Order Status</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>@orderDetials.OrderID</td>
+                                                    <td>@orderDetials.OrderDate.ToString("MMM dd, yyyy")</td>
+                                                    <td>@orderDetials.CustomerName</td>
+                                                    <td>@orderDetials.CustomerAddress</td>
+                                                    <td>@orderDetials.ContactNumber</td>
+                                                    <td>Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round(orderDetials.TotalAmount, 2))).ToString("N")</td>
+                                                    @if (orderDetials.PaymentTypeId == 2)
+                                                    {
+                                                        <td>Credit Card</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>Cash on Delivery</td>
+                                                    }
+                                                    <td>@orderDetials.Outlet.OutletName</td>
+                                                    <td>@orderDetials.OrderStatusId</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-12 mt-4">
+                                            <h6>Item Details</h6>
+                                            <table class="table table-bordered" style="width:100%">
+                                                <tr>
+                                                    <th>Item Name</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Qty</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                                @foreach (var items in orderDetials.ListOrderDetails)
+                                                {
+                                                    <tr>
+                                                        <td>@items.ItemName</td>
+                                                        <td>Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round(items.Amount, 2))).ToString("N")</td>
+                                                        <td>@items.OrderQuantity</td>
+                                                        <td>Rs.@Convert.ToDouble(String.Format("{0:0.00}", @Math.Round((items.OrderQuantity * items.Amount), 2))).ToString("N")</td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </div>
+                                    </div>
+
+
+                                }
+                                else
+                                {
+                                    if (isDisabled)
+                                    {
+                                        <img src="images/Loading.gif" width="100px" />
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; Sathosa Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+@code {
+
+    private string status { get; set; } = "";
+    private PaymentGatewayDetails res { get; set; } = null;
+    private PaymentResponse rsResult { get; set; }
+    private double totalAuthorizedAmount { get; set; } = 0;
+    private double totalCapturedAmount { get; set; } = 0;
+    private double totalDisbursedAmount { get; set; } = 0;
+    private double totalRefundedAmount { get; set; } = 0;
+    private double refundAmount { get; set; } = 0;
+    private bool isUpdate { get; set; } = false;
+    private string orderId { get; set; }
+    private string result { get; set; } = "";
+    private bool isDisabled { get; set; } = false;
+    DateTime myDateTime = DateTime.Now;
+    string year;
+    private AdminLogin User { get; set; }
+    private Order orderDetials { get; set; }
+    private List<CancelReason> cancelReasons { get; set; }
+    private int selectedCancelReason { get; set; } = -1;
+
+    private int isRefund { get; set; } = 0;
+
+
+    AppSettingsApi appSettingsApi { get; set; }
+
+    protected override void OnInitialized()
+    {
+        year = myDateTime.Year.ToString();
+        appSettingsApi = Configuration.GetSection("ApiLinks").Get<AppSettingsApi>();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            User = await localStore.GetItemAsync<AdminLogin>("user");
+            cancelReasons = await apiService.GetCancelReasons();
+            await JSRuntime.InvokeAsync<object>("sidenavOpenClose");
+            if (User == null)
+            {
+                NavManager.NavigateTo("/");
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async void GetRefundDetails()
+    {
+        orderId = orderId.Trim();
+        if (orderId == null || orderId == "")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Please enter order id!");
+        }
+        else
+        {
+            isDisabled = true;
+            orderDetials = (await apiService.GetOrderDetails(orderId)).ToList().ElementAt(0);
+            if (orderDetials.PaymentTypeId == 2)
+            {
+                res = await paymentService.GetRefundPaymentDetails(orderId);
+                isRefund = 1;
+            }
+            else
+            {
+                isRefund = 0;
+            }
+
+            @*apiService.UpdateOrderStatus(orderId,5);*@
+
+
+        }
+        StateHasChanged();
+    }
+
+    private async void RefundPayment()
+    {
+        if (orderId == null || orderId == "" || selectedCancelReason == -1)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Please enter order id & select cancel reason!");
+        }
+        else if (refundAmount <= 0)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Please enter refund amount!");
+        }
+        else
+        {
+            //result = await paymentService.RefundPayment(orderId);
+
+            rsResult = await paymentService.RefundPayment(orderId, refundAmount);
+
+            if (rsResult.result == "SUCCESS")
+            {
+                await apiService2.UpdateOrderStatus(orderId,selectedCancelReason,1);
+                await JSRuntime.InvokeAsync<object>("Alert", "success","" , "Payment Refund Successfull!");
+                Clear();
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", rsResult.error.cause, rsResult.error.explanation);
+            }
+        }
+        StateHasChanged();
+    }
+
+    private async void CancelOrder()
+    {
+        if (orderId == null || orderId == "" || selectedCancelReason == -1)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Please enter order id & select cancel reason!");
+        }
+        else
+        {
+            await apiService2.UpdateOrderStatus(orderId, selectedCancelReason,0);
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Payment Refund Successfull!");
+            Clear();
+        }
+        StateHasChanged();
+    }
+
+    private void Clear()
+    {
+        NavManager.NavigateTo("refund", true);
+        res = null;
+        totalAuthorizedAmount = 0;
+        totalCapturedAmount = 0;
+        totalDisbursedAmount = 0;
+        totalRefundedAmount = 0;
+        isRefund = 0;
+        isDisabled = false;
+        orderId = "";
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,79 @@
+﻿@page "/SellerApproval"
+@using MotherSLAdmin.Data;
+@inject IApiService ApiService;
+@using System.Collections.Generic;
+<SideMenu activeValue="SellerApproval" />
+
+<div id="main">
+    <div class="index-container">
+        <center><h1 class="display-6 fw-bolder mb-5">New sellers requests Handling</h1></center><br />
+        <a href="/currentSellers">
+            <input type="submit" value="Current Sellers list" class="secondary-btn1" style="width:200px;height:40px;margin-right:0;" />
+        </a>
+        <br /><br /><br />
+        <table class="table" >
+            <thead>
+                <tr>
+                    <th scope="col" style="width:100px;align-items:center;">ID</th>
+                    <th scope="col" style="width:140px;">Name</th>
+                    <th scope="col" style="width:100px;">Phone</th>
+                    <th scope="col" style="width:100px;">Actions</th>
+                    <th scope="col" style="width:170px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Mark</td>
+                    <td>
+                        <a href="/sFilledForm">
+                            <input type="submit" value="View" class="primary-btn" style="width:100px;height:35px;" /><br />
+                        </a>
+                    </td>
+                    <td>
+                        <input type="submit" value="Approve" class="primary-btn" style="width:100px;height:35px;" />&nbsp;&nbsp;&nbsp;
+                        <input type="submit" value="Dissaprove" class="primary-btn" style="width:100px;height:35px;" /><br />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+@code {
+    string year = DateTime.Now.Year.ToString();
+    //string name = "";
+
+    //private List<SellerApprovalM> Sellerapproval;
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+        //if (firstRender)
+        //{
+            //Sellerapproval = (await ApiService.GetSellerApprovals()).ToList();
+        //}
+
+    //}
+
+    //protected async void Btn()
+    //{
+        
+    //}
+
+    //private IEnumerable<SellerApprovalM> SellerApprovals;
+}

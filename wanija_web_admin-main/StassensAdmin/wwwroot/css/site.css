@@ -1,0 +1,128 @@
+html,body{
+    overflow-x:hidden;
+}
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.tabBtns {
+    border: 1px solid #754e82;
+    color: #754e82;
+}
+    .tabBtns.active, .tabBtns:hover {
+        background-color: #754e82;
+        color: white;
+    }
+    .tabBtns:focus{
+        box-shadow:none;
+    }
+.blogMainImg{
+    width:100%;
+    max-height:400px;
+    object-fit:cover;
+}
+.rz-data-grid-data{
+    overflow-x:scroll;
+}
+.rz-grid-table thead th {
+    width: 100px;
+}
+.blogMainImgSmall{
+    width:100%;
+    height:150px;
+    object-fit:cover;
+}
+.note-editor .tooltip-inner, .note-editor .tooltip-arrow:before {
+    display: none !important;
+}
+.centerCol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-primary {
+    background-color: #494;
+    border-color: #494;
+}
+    .btn-primary:hover {
+        background-color: rgba(24,55,24,1);
+        border-color: rgba(24,55,24,1);
+    }
+.delBtn{
+    padding:0px 2px !important;
+}
+.itemUpdateImage{
+    width:150px;
+}
+.note-btn-group.btn-group.note-insert {
+    display: none !important;
+}
+
+/*New Stlying Part*/
+
+/*primary button - yellow */
+.primary-btn {
+    width: 120px !important;
+    padding-left: 20px;
+    height: 45px;
+    border-radius: 8px;
+    color: white;
+    background-color: #FFB554;
+    border: none;
+}
+
+/*secondary button - orange*/
+.secondary-btn {
+    border-radius: 8px;
+    color: white;
+    background-color: #FF5454;
+    height: 45px;
+    border: 1px solid;
+    outline: solid;
+    width: 130px !important;
+    padding-left: 20px;
+}
+
+.primary-btn:hover {
+    color: white;
+    background: #7a0202;
+    transition: 0.3s ease-in-out;
+}
+
+.secondary-btn:hover {
+    color: white;
+    outline: 2px solid #FF5454;
+    transition: 0.2s ease-in-out;
+}
+
+.secondary-btn1 {
+    border-radius: 8px;
+    color: white;
+    background-color: #FF5454;
+    height: 45px;
+    border: 1px solid;
+    outline: solid;
+    width: 200px !important;
+    padding-left: 20px;
+}
+
+.secondary-btn1:hover {
+    color: white;
+    outline: 2px solid #FF5454;
+    transition: 0.2s ease-in-out;
+}

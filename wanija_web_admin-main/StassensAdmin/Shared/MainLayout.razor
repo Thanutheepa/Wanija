@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+@using Radzen.Blazor
+@*<div class="main">
+        <div class="content">
+            @Body
+        </div>
+    </div>
+*@
+<div class="inner-wrapper">
+
+    @Body
+
+</div>
+<RadzenDialog />
+<RadzenNotification />
+
+@code {
+
+    private AdminLogin User { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            User = await localStore.GetItemAsync<AdminLogin>("user");
+            if (User == null)
+            {
+                NavManager.NavigateTo("/");
+            }
+
+        }
+    }
+}

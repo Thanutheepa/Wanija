@@ -1,0 +1,271 @@
+﻿@page "/Slider"
+@inject IFileUpload fileUpload
+@inject IJSRuntime JSRuntime
+@inject IApiService ApiService
+@inject IApiService ApiService2
+@inject IApiService ApiService3
+@inject IApiService ApiService4
+@inject IApiService ApiService5
+@inject ILocalStorageService localStore
+@inject NavigationManager NavManager
+@inject IConfiguration Configuration
+@using System
+
+
+<SideMenu activeValue="Slider" />
+
+<h3>SliderAndBanner</h3>
+
+<div id="main">
+
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Slider</h3>
+                </div>
+                <div class="col-12 col-md-6 order-md-2 order-first">
+                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Sliders</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>New Slider </h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Upload Image <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <InputFile OnChange="fileChange" />
+
+                                            <p>@imageName</p>
+
+
+
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h4>Existing Sliders </h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                @if(isUpdate)
+                                {
+                                    <div class="row mb-5">
+                                        <div class="col-md-4">
+                                            <img src="@updateImage" width="100%" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <label for="updateSeq">Sequence Number</label>
+                                            <input type="number" @bind-value="@updateSeq" id="updateSeq" class="form-control" />
+                                            <button class="btn mt-2 btn-primary" @onclick="UpdateOrder">Update</button>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="row">
+                                    
+                                        @if (Sliders != null)
+                                        {
+                                            @foreach (var slider in Sliders)
+                                            {<div class="col-md-6 my-2">
+                                                    <img style="max-width:100%; margin-bottom:25px;" src="@slider.ImageUrl" />
+                                                </div>
+                                             <div class="col-md-6 centerCol mb-2">
+
+                                                 <button type="submit" class="btn btn-primary  me-1" @onclick="()=>ChangeUpdate(slider)" style="margin-left:100px">Change order</button>
+                                                    <button type="submit" class="btn btn-danger  me-1" @onclick="()=>Delete(slider)" style="margin-left:100px">Delete</button>
+                                                </div>
+
+                                            }
+                                        }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+
+
+    private IEnumerable<Slider> Sliders;
+
+    private string msg;
+    private string imageName { get; set; } = "";
+    DateTime myDateTime = DateTime.Now;
+    string year;
+    AppSettingsApi appSettingsApi { get; set; }
+
+    IFileListEntry file;
+    String stat = "";
+    int catogoryId = 0;
+    private bool isUpdate { get; set; } = false;
+    private Slider updateSlider { get; set; }
+    private string updateImage { get; set; } = "";
+    private int updateSeq { get; set; } = 0;
+
+    private async Task fileChange(IFileListEntry[] files)
+    {
+        Slider newslider = new Slider();
+        newslider.ImageUrl = "";
+        file = files.FirstOrDefault();
+        imageName = file.Name;
+        if (file != null)
+        {
+            string contentType = file.Type;
+
+            string[] extension = file.Name.Split('.');
+
+            if (!extension[extension.Length - 1].ToLower().Equals("jpg") && !extension[extension.Length - 1].ToLower().Equals("jpeg") && !extension[extension.Length - 1].ToLower().Equals("png"))
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Invalid File Type!");
+
+            }
+            else
+            {
+
+                await fileUpload.UploadSliderAsync(file);
+                StateHasChanged();
+
+
+                newslider.ImageUrl = appSettingsApi.websiteLink + "/images/Slider/" + file.Name;
+                newslider.Sequence = 1;
+                StateHasChanged();
+                msg = await ApiService2.AddSlider(newslider);
+
+                Sliders = (await ApiService3.GetSlider()).ToList();
+                StateHasChanged();
+                if (msg == "\"Slider Added successfully.\"")
+                {
+                    await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Added!");
+                }
+                else
+                {
+                    await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+                }
+
+            }
+
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        year = myDateTime.Year.ToString();
+        Sliders = new List<Slider>();
+        Sliders = (await ApiService.GetSlider()).ToList();
+        appSettingsApi = Configuration.GetSection("ApiLinks").Get<AppSettingsApi>();
+        StateHasChanged();
+        Console.WriteLine("hello");
+    }
+
+    private async void Delete(Slider slider)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure?");
+        if (confirmed)
+        {
+
+            stat = await ApiService4.DeleteSlider(slider);
+            StateHasChanged();
+            Sliders = new List<Slider>();
+            Sliders = (await ApiService5.GetSlider()).ToList();
+            if (stat == "\"Slider Deleted successfully.\"")
+            {
+
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Deleted!");
+
+            }
+            else
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+
+        }
+    }
+
+    private async void ChangeUpdate(Slider slider)
+    {
+        await JSRuntime.InvokeVoidAsync("OnScrollEvent");
+        isUpdate = true;
+        updateImage = slider.ImageUrl;
+        updateSeq = slider.Sequence;
+        updateSlider = slider;
+        StateHasChanged();
+    }
+
+    private async void UpdateOrder()
+    {
+        if (updateSeq > 0)
+        {
+
+            stat = await ApiService4.UpdateOrder(updateSlider, updateSeq);
+
+            Sliders = new List<Slider>();
+            Sliders = (await ApiService5.GetSlider()).ToList();
+            if (stat == "\"Slider Updated successfully.\"")
+            {
+
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Successfully Updated!");
+                isUpdate = false;
+                updateImage = "";
+                updateSeq = 0;
+                updateSlider = null;
+
+            }
+            else
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", stat);
+
+            StateHasChanged();
+
+        }
+        else
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "Danger", "", "Sequence Number Cannot be Blank!");
+        }
+    }
+
+}

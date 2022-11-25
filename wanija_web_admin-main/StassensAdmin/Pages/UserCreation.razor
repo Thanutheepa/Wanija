@@ -1,0 +1,308 @@
+﻿@page "/UserCreation"
+@inject IJSRuntime JSRuntime
+@inject IApiService ApiService
+@inject IApiService ApiService2
+@inject IApiService ApiService3
+@inject IApiService ApiService4
+@inject IApiService ApiService5
+@inject IApiService ApiService6
+@inject IApiService ApiService7
+
+<SideMenu activeValue="UserCreation" />
+
+<div id="main">
+
+    <header class="mb-3">
+        <button class="btn sidenavOpen burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </button>
+    </header>
+    <div class="page-heading">
+
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>User Creation</h3>
+                </div>
+                <div class="col-12 col-md-6 order-md-2 order-first">
+                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">User Creation</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <section id="multiple-column-form">
+
+            <div class="row match-height">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>New User </h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">User Type <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group">
+                                            <RadzenDropDown Class="w-100" @bind-Value="UserType" AllowClear="true" TValue="int" Data="@usertypes" TextProperty="UserTypeName" ValueProperty="UserTypeId" Placeholder="Select User Type" AllowFiltering="true" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="row">
+                                        <div class="col-md-3 col-12">
+                                            <div class="form-group"><label class="form-control-sm">Name <span class="text-danger">*</span></label></div>
+                                        </div>
+                                        <div class="col-md-3 col-12">
+                                            <div class="form-group"><input type="text" class="form-control form-control-sm"></div>
+                                        </div>
+                                    </div>*@
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">User Name <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" @bind-value="UserName" class="form-control form-control-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Password <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" @bind-value="Password" class="form-control form-control-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm">Re-type Password <span class="text-danger">*</span></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><input type="text" @bind-value="RetypePassword" class="form-control form-control-sm"></div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12">
+                                        <div class="form-group"><label class="form-control-sm"></label></div>
+                                    </div>
+                                    <div class="col-md-3 col-12 justify-content-end">
+
+                                        <button type="submit" class="btn btn-primary  me-1" @onclick="CreateUser">Create</button>
+
+                                        <button type="reset" class="btn btn-light-secondary ">Reset</button>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-header">
+                            <h4 class="card-title">Existing User</h4>
+                        </div>
+
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 my-2">
+                                        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                                                        TItem="User" ColumnWidth="300px" Data="@AllUsers" LogicalFilterOperator="LogicalFilterOperator.Or">
+                                            <Columns>
+                                                <RadzenDataGridColumn TItem="User" Property="ID" Title="Id" Width="150px" />
+                                                <RadzenDataGridColumn TItem="User" Property="UserName" Title="User Name" Width="150px" />
+                                                <RadzenDataGridColumn TItem="User" Property="UserType" Title="UserType" Width="150px" >
+                                                    <Template Context="AllUsers">
+                                                        @if (AllUsers.UserType == 1)
+                                                        {
+                                                            <span>Call Center</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 2)
+                                                        {
+                                                            <span>Company User</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 3)
+                                                        {
+                                                            <span>Outlet User</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 4)
+                                                        {
+                                                            <span>Stassen Admin</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 5)
+                                                        {
+                                                            <span>Courier Service User</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 6)
+                                                        {
+                                                            <span>Call Center Admin</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 7)
+                                                        {
+                                                            <span>DL</span>
+                                                        }
+                                                        else if (AllUsers.UserType == 8)
+                                                        {
+                                                            <span>RM</span>
+                                                        }
+                                                    </Template>
+                                                 </RadzenDataGridColumn>
+                                                <RadzenDataGridColumn TItem="User" Title="Action" Context="AllUsers" Width="150px">
+                                                    <Template Context="Allusers">
+                                                        <RadzenButton Size="ButtonSize.Medium" Style="display:block; width:110px; margin-bottom:10px;" Click=@(args => Delete(Allusers)) Text="Delete" ButtonStyle="ButtonStyle.Primary" />
+
+                                                        <RadzenButton Size="ButtonSize.Medium" Style="display:block; width:110px; margin-top:10px" Click=@(args => ResetPassword(Allusers)) Text="Reset" ButtonStyle="ButtonStyle.Secondary" />
+                                                    </Template>
+
+                                                </RadzenDataGridColumn>
+
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+    <footer>
+        <div class="clearfix mb-0 text-muted">
+            <div class="float-start">
+                <p>@year &copy; MSL Admin</p>
+            </div>
+            <div class="float-end">
+                <p>
+                    Powered by <a href="http://melstasoft.com/">Bellvantage Pvt Litd</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+
+
+@code {
+
+    DateTime myDateTime = DateTime.Now;
+    string year;
+
+    private IEnumerable<UserType> usertypes;
+    private IEnumerable<User> AllUsers;
+
+
+    //variables for create user
+
+    private int ID { get; set; }
+    private string UserName { get; set; }
+    private string Password { get; set; }
+    private string RetypePassword { get; set; }
+    private int UserType { get; set; }
+    private int OutletId { get; set; }
+    private int IsActive { get; set; }
+    User newuser = new User();
+    private string msg;
+
+    protected override async Task OnInitializedAsync()
+    {
+        year = myDateTime.Year.ToString();
+        usertypes = (await ApiService.GetUserType()).ToList();
+        AllUsers = (await ApiService2.GetAllUser()).ToList();
+
+    }
+    private async void CreateUser()
+    {
+        newuser.UserName = UserName;
+        newuser.Password = Password;
+        newuser.UserType = UserType;
+
+        if (UserName == null || Password == null || UserType == 0 || RetypePassword == null)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Required Fields Cannot be Empty!");
+        }
+
+        else if (Password != RetypePassword)
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", "Password is not matched");
+        }
+
+        else
+        {
+            msg = await ApiService3.CreateUser(newuser);
+            AllUsers = (await ApiService4.GetAllUser()).ToList();
+            StateHasChanged();
+            clear();
+            StateHasChanged();
+            if (msg == "\"User created successfully.\"")
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "success", "", "User created successfully.");
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+            }
+
+        }
+
+
+
+    }
+
+    private async void Delete(User deleteUser)
+    {
+        msg = await ApiService5.DeleteUser(deleteUser);
+        StateHasChanged();
+        AllUsers = (await ApiService6.GetAllUser()).ToList();
+        StateHasChanged();
+
+        if (msg == "\"User Deleted successfully.\"")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "User Deleted successfully.");
+        }
+        else
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+        }
+
+
+    }
+
+    private async void ResetPassword(User UserForRest)
+    {
+        UserForRest.Password = "abc123";
+
+        msg = await ApiService7.UpdatePassword(UserForRest);
+        StateHasChanged();
+
+        if (msg == "\"Password Updated successfully.\"")
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "success", "", "Password updated successfully.");
+        }
+        else
+        {
+            await JSRuntime.InvokeAsync<object>("Alert", "error", "", msg);
+        }
+
+
+    }
+
+    private void clear()
+    {
+        UserName = null;
+        Password = null;
+        RetypePassword = null;
+        UserType = 0;
+    }
+}
